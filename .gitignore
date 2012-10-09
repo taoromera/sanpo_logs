@@ -15,7 +15,6 @@ app/controllers/*.*~
 /log/*
 /tmp/*
 /config/initializers/01_keys.rb
-/config/initializers/secret_token.rb
 /db/*.sqlite3
 /public/system/*
 /coverage/
