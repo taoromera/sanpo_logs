@@ -1,0 +1,25 @@
+
+production:
+  adapter: postgis
+  encoding: unicode
+  database: japan
+  pool: 5
+  username: postgres
+
+development:
+  adapter: postgis
+  encoding: unicode
+  database: japan
+  pool: 5
+  username: postgres
+
+#need that stuff to make the test db
+test:
+  adapter: postgis
+  encoding: unicode
+  database: sanpo_test
+  pool: 5
+  username: postgres
+  postgis_extension: true
+  script_dir: /usr/share/postgresql/9.1/contrib/postgis-2.1/
+

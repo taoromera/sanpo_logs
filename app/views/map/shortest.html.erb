@@ -1,0 +1,16 @@
+<script>
+  $(document).ready(function() {
+    debug_map(<%= @route.to_json.html_safe %>, <%= @use_osm %>, <%= @spots.to_json.html_safe %>);
+  });
+</script>
+<div id="debugMap"></div>
+<div id="current_location_title">
+  Your current location: <span id="center_map"> center here </span>
+</div>
+<div id="current_location"> </div>
+Route coordinates:
+<div id="coordinates"> </div>
+
+<div> 
+
+</div>

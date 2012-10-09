@@ -1,0 +1,56 @@
+#debugMap {
+  width: 100%;
+  height: 600px;
+  margin: 0;
+}
+
+#current_location_title {
+  display:none;
+}
+
+#center_map {
+  margin-left: 5px;
+  color: blue;
+  cursor: pointer;
+}
+
+#center_map:hover {
+  background: yellow;
+}
+
+.olControlMousePosition {
+  position: absolute;
+  right: 10px;
+  bottom: 0px;
+  height: 15px;
+  display: block;
+  font-size: smaller;
+  background-color: white
+}
+.olControlAttribution {
+  display:none;
+}
+
+.olLayerGoogleCopyright
+{
+  right:3px;
+  bottom:2px;
+  left:auto;
+}
+
+.olLayerGoogleCopyrightogleV3.olLayerGoogleCopyright
+{
+  bottom:0;
+  right:0!important;
+}
+
+.olLayerGoogleCopyrightogleV3yerGooglePoweredBy
+{
+  left:2px;
+  bottom:2px;
+}
+
+.olLayerGoogleV3.olLayerGoogleCopyrightogleV3yerGooglePoweredByrGooglePoweredBy
+{
+  bottom:0!important;
+}

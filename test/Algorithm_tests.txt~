@@ -1,0 +1,9 @@
+氷川台駅～池袋駅：
+map/shortest.html?source=139.665547,35.749569&target=139.710311,35.728851&out_spots=1&rest_spots=1&cafe_spots=1&cars=0&curr_time=1412
+PC: 13.3s  AWS: 17.7s
+
+代官山～恵比寿駅：
+map/shortest.html?source=139.710118,35.646573&target=139.703146,35.64804&out_spots=1&rest_spots=1&cafe_spots=1&cars=0&curr_time=1412
+PC: 14.1s  AWS: 12.1s
+
+
