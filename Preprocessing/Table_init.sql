@@ -1,3 +1,5 @@
+CREATE SEQUENCE sanpo_routes_id;
+
 CREATE TABLE IF NOT EXISTS sanpo_routes (
   id bigint NOT NULL DEFAULT nextval('sanpo_routes_id'),
   user_route_id bigint NOT NULL,
@@ -13,3 +15,16 @@ CREATE TABLE IF NOT EXISTS sanpo_routes (
   PRIMARY KEY (id)
 );
 
+CREATE SEQUENCE sanpo_photos_id;
+
+CREATE TABLE IF NOT EXISTS sanpo_photos (
+  id bigint NOT NULL DEFAULT nextval('sanpo_photos_id'),
+  user_route_id bigint NOT NULL,
+  lat decimal(9,6) NOT NULL,
+  lng decimal(9,6) NOT NULL,
+  shoot_time timestamp NOT NULL,
+  filename text,
+  memo varchar(512),
+  geo_tag text,
+  PRIMARY KEY (id)
+);
