@@ -1,6 +1,8 @@
 class Photolog < ActiveRecord::Base
 
   self.table_name = "sanpo_photos"
+  attr_accessible :photo
+  has_attached_file :photo
 
   def up_photo(params)
     

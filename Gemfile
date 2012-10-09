@@ -18,6 +18,9 @@ gem 'rgeo-geojson'
 
 gem "json"
 
+# Image attachment handler
+gem "paperclip", "~> 3.0"
+
 #To get messages from exceptions in our server
 gem 'exception_notification'
 gem 'letter_opener', group: :development
