@@ -2,7 +2,6 @@ class Photolog < ActiveRecord::Base
 
   self.table_name = "sanpo_photos"
   attr_accessible :photo
-  has_attached_file :photo
 
   def up_photo(params)
     
@@ -22,12 +21,25 @@ class Photolog < ActiveRecord::Base
     if password != date[0..3] + user_id.reverse + date[4..5]
       return "Error: password incorrect"
     end
+
+    # Create entry in DB for this photo
+binding.pry
+    Photolog.connection.execute("INSERT INTO sanpo_photos VALUES (DEFAULT, '#{user_id}', #{user_route_id}, #{user_photo_id}, #{photo_lat}, #{photo_lon}, '#{[shoot_time.split('_')[0], shoot_time.split('_')[1].gsub!('-', ':')].join(' ')}', '', '#{memo}', '#{geo_tag}')")
+   
+    # Get the id of the created entry
+    entry_id = Photolog.connection.execute("SELECT id FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}").getvalue(0,0)
+
+    # Generate filename: entry_id + random string of 25 characters
+    photo_filename = entry_id + (0...25).map{ ('a'..'z').to_a[rand(26)] }.join
     
     # Save the photo to a file with filename being the id of the photo
+    dir = "/home/sanpo/rails-interface/sanpo_logs/public/user_photos/#{user_id}/#{user_route_id}/"
+    FileUtils.mkdir_p(dir) unless File.exists?(dir)
+    File.open(dir+photo_filename, 'wb') {|f| f.write(params[:photo_data].read)}    
     
-    # Create entry in DB for this photo
-    PhotoLog.connection.execute("INSERT INTO sanpo_photos(id, user_id, user_route_id)")
-    
+    # Insert filename into DB
+    Photolog.connection.execute("UPDATE sanpo_photos SET filename = '#{photo_filename}' WHERE id = #{entry_id}")
    
+    return {:result => '1', :route_id => id, :create_time => shoot_time}
   end
 end
