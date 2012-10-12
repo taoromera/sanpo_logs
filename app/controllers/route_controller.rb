@@ -9,7 +9,7 @@ class RouteController < ApplicationController
 
   def view_log
     log = Routelog.new
-    status = log.up_route(params[:user_id], params[:route_id])
+    status = log.view_log(params[:user_id], params[:route_id])
     render :json => status
   end
  

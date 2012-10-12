@@ -5,7 +5,7 @@ class Photolog < ActiveRecord::Base
 
   def up_photo(params)
     
-    user_id = Digest::SHA2.hexdigest(params[:user_id])
+    user_id = params[:user_id]
     password = params[:password]
     user_route_id = params[:user_route_id]
     user_photo_id = params[:user_photo_id]
@@ -22,6 +22,8 @@ class Photolog < ActiveRecord::Base
       return "Error: password incorrect"
     end
 
+    user_id = Digest::SHA2.hexdigest(params[:user_id])
+    
     # Create entry in DB for this photo
     Photolog.connection.execute("INSERT INTO sanpo_photos VALUES (DEFAULT, '#{user_id}', #{user_route_id}, #{user_photo_id}, #{photo_lat}, #{photo_lon}, '#{[shoot_time.split('_')[0], shoot_time.split('_')[1].gsub!('-', ':')].join(' ')}', '', '#{memo}', '#{geo_tag}')")
    

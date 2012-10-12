@@ -4,7 +4,7 @@ class Routelog < ActiveRecord::Base
   
   def up_route(params)
   
-    user_id = Digest::SHA2.hexdigest(params[:user_id])
+    user_id = params[:user_id]
     password = params[:password]
     date = params[:date]
     user_route_id = params[:user_route_id]
@@ -15,6 +15,8 @@ class Routelog < ActiveRecord::Base
     if password != date[0..3] + user_id.reverse + date[4..5]
       return "Error: password incorrect"
     end
+    
+    user_id = Digest::SHA2.hexdigest(params[:user_id])
     
     # Split points into coords and timestamps
     arr = points.split(',')
@@ -42,7 +44,7 @@ class Routelog < ActiveRecord::Base
 
   def view_log(user_id, route_id)
     user_id = Digest::SHA2.hexdigest(user_id)
-    res = Routelog.connection.execute("SELECT start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, length FROM sanpo_routes WHERE user_id = #{user_id} AND user_route_id = #{route_id}")
+    res = Routelog.connection.execute("SELECT start_time, end_time, start_lat, start_lng, end_lat, end_lng, ST_AsText(geom), length FROM sanpo_routes WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}")
     start_time = res.getvalue(0,0)
     end_time = res.getvalue(0,1)
     start_lat = res.getvalue(0,2)
@@ -52,11 +54,14 @@ class Routelog < ActiveRecord::Base
     geom = res.getvalue(0,6)
     length = res.getvalue(0,7)
 
-    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = #{user_id} AND user_route_id = #{route_id}").values.flatten.transpose
+    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}").values.flatten.transpose
 
     photos = []
-    lat.each_with_index do |la,idx|
-      photos.push {:lat => la, :lon => lon[idx], :shoot_time => shoot_time[idx], :memo => memo[idx], :get_tag => get_tag[idx], :url => "www.sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{filename[idx]}"}
+    if !lat.nil?
+      lat.each_with_index do |la,idx|
+        photos.push [{:lat => la, :lon => lon[idx], :shoot_time => shoot_time[idx], :memo => memo[idx], :get_tag => get_tag[idx], :url => "www.sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{filename[idx]}"}]
+      end
+      photos.flatten!
     end
     
     return {:result => '1', :start_time => start_time, :end_time => end_time, :start_lat => start_lat, :start_lng => start_lng, :end_lat => end_lat, :end_lng => end_lng, :geom => geom, :length => length, :photos => photos}
