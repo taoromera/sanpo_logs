@@ -59,7 +59,7 @@ class Routelog < ActiveRecord::Base
     photos = []
     if !lat.nil?
       lat.each_with_index do |la,idx|
-        photos.push [{:lat => la, :lon => lon[idx], :shoot_time => shoot_time[idx], :memo => memo[idx], :get_tag => get_tag[idx], :url => "www.sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{filename[idx]}"}]
+        photos.push [{:lat => la, :lon => lon[idx], :shoot_time => shoot_time[idx], :memo => memo[idx], :geo_tag => geo_tag[idx], :url => "www.sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{filename[idx]}"}]
       end
       photos.flatten!
     end
