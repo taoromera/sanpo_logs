@@ -75,7 +75,7 @@ class Routelog < ActiveRecord::Base
       photos.flatten!
     end
     
-    return {:result => '1', :start_time => start_time, :end_time => end_time, :start_lat => start_lat, :start_lng => start_lng, :end_lat => end_lat, :end_lng => end_lng, :geom => geom, :length => length, :title => title, :walk_time => walk_time, :photos => photos}
+    return {:result => '1', :start_time => start_time, :end_time => end_time, :start_lat => start_lat, :start_lng => start_lng, :end_lat => end_lat, :end_lng => end_lng, :geom => geom, :walk_distance => length, :title => title, :walk_time => walk_time, :photos => photos}
   end
   
   def factory
