@@ -56,12 +56,21 @@ class Routelog < ActiveRecord::Base
     title = res.getvalue(0,8)
     walk_time = res.getvalue(0,9)
 
+    # Parse raw text into several multilinestring objects
+    geom = [geom].flatten.map! {|i| factory.parse_wkt(i)}    
+    
+    # Convert "route" into one multi_line_string object
+    path = factory.multi_line_string geom
+    
+    # Parse route_final to make a RGEO object
+    geom = RGeo::GeoJSON.encode(path)
+
     lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}").values.transpose
 
     photos = []
     if !lat.nil?
       lat.each_with_index do |la,idx|
-        photos.push [{:lat => la, :lon => lon[idx], :shoot_time => shoot_time[idx], :memo => memo[idx], :geo_tag => geo_tag[idx], :url => "www.sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{filename[idx]}"}]
+        photos.push [{:lat => la, :lon => lon[idx], :shoot_time => shoot_time[idx], :memo => memo[idx], :geo_tag => geo_tag[idx], :url => "sanpo.mobi/user_photos/#{user_id}/#{route_id}/#{filename[idx]}"}]
       end
       photos.flatten!
     end
@@ -69,4 +78,8 @@ class Routelog < ActiveRecord::Base
     return {:result => '1', :start_time => start_time, :end_time => end_time, :start_lat => start_lat, :start_lng => start_lng, :end_lat => end_lat, :end_lng => end_lng, :geom => geom, :length => length, :title => title, :walk_time => walk_time, :photos => photos}
   end
   
+  def factory
+    @@factory ||= RGeo::Geographic.spherical_factory(:srid => 4326)
+  end
+
 end
