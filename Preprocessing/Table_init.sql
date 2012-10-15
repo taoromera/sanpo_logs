@@ -11,8 +11,9 @@ CREATE TABLE IF NOT EXISTS sanpo_routes (
   end_lat decimal(9,6) NOT NULL,
   end_lng decimal(9,6) NOT NULL,
   geom geometry(MultiLineString,4326),
-  length decimal(5,3),
+  length decimal(8,3),
   tracking_times text,
+  title text,
   public boolean NOT NULL DEFAULT '1',
   PRIMARY KEY (id)
 );
