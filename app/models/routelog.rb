@@ -56,7 +56,7 @@ class Routelog < ActiveRecord::Base
     title = res.getvalue(0,8)
     walk_time = res.getvalue(0,9)
 
-    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}").values.flatten.transpose
+    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}").values.transpose
 
     photos = []
     if !lat.nil?
@@ -66,7 +66,7 @@ class Routelog < ActiveRecord::Base
       photos.flatten!
     end
     
-    return {:result => '1', :start_time => start_time, :end_time => end_time, :start_lat => start_lat, :start_lng => start_lng, :end_lat => end_lat, :end_lng => end_lng, :geom => geom, :length => length, :photos => photos}
+    return {:result => '1', :start_time => start_time, :end_time => end_time, :start_lat => start_lat, :start_lng => start_lng, :end_lat => end_lat, :end_lng => end_lng, :geom => geom, :length => length, :title => title, :walk_time => walk_time, :photos => photos}
   end
   
 end
