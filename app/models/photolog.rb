@@ -34,7 +34,7 @@ class Photolog < ActiveRecord::Base
     photo_filename = entry_id + (0...25).map{ ('a'..'z').to_a[rand(26)] }.join + '.jpg'
     
     # Save the photo to a file with filename being the id of the photo
-    dir = "/home/sanpo/web_server/user_photos/#{user_id}/#{user_route_id}/"
+    dir = "/web_server/user_photos/#{user_id}/#{user_route_id}/"
     FileUtils.mkdir_p(dir) unless File.exists?(dir)
     File.open(dir+photo_filename, 'wb') {|f| f.write(params[:photo_data].read)}    
     
