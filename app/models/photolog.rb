@@ -51,6 +51,10 @@ class Photolog < ActiveRecord::Base
     user_id = check_pass(password, user_id)
     user_id.nil? ? return("Error: password incorrect") : 1
     
+    # Delete photo file
+    filename = Photolog.connection.execute("SELECT filename FROM #{self.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}").getvalue(0,0)
+    File.delete("/web_server/user_photos/#{user_id}/#{user_route_id}/#{filename}")
+    
     # Delete photo entry from DB
     Photolog.connection.execute("DELETE FROM #{self.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}")
     

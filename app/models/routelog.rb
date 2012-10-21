@@ -48,7 +48,7 @@ class Routelog < ActiveRecord::Base
     end_lat = res.getvalue(0,4)
     end_lng = res.getvalue(0,5)
     geom = res.getvalue(0,6)
-    length = res.getvalue(0,7)
+    length = res.getvalue(0,7).round(0)/1000
     title = res.getvalue(0,8)
     walk_time = res.getvalue(0,9)
 
