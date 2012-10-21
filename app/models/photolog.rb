@@ -56,13 +56,19 @@ class Photolog < ActiveRecord::Base
     end
     
     # Delete photo file
-    filename = Photolog.connection.execute("SELECT filename FROM #{Photolog.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}").getvalue(0,0)
+    filename = Photolog.connection.execute("SELECT filename FROM #{Photolog.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}").values.flatten
+    if filename.empty?
+      return {:status => '1', :user_photo_id => user_photo_id}
+    else
+      filename = filename[0]
+    end
+      
     File.delete("/web_server/user_photos/#{user_id}/#{user_route_id}/#{filename}")
     
     # Delete photo entry from DB
     Photolog.connection.execute("DELETE FROM #{Photolog.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}")
     
-    return {:status => '1'}
+    return {:status => '1', :user_photo_id => user_photo_id}
     
   end
   

@@ -21,23 +21,26 @@ class Routelog < ActiveRecord::Base
     coords = []
     timestamps = []
     (0..arr.length/3-1).each do |idx|
-      coords.push "#{arr[idx*3+1]} #{arr[idx*3]}"
-      timestamps.push arr[idx*3+2]
+      # Filter out incorrect GPS measurement points (-180, -180) 
+      if arr[idx*3+1].to_i != -180 && arr[idx*3].to_i != -180
+        coords.push "#{arr[idx*3+1]} #{arr[idx*3]}"
+        timestamps.push arr[idx*3+2]
+      end
     end
 
     # Insert data into DB
     start_time = timestamps[0]
     end_time = timestamps[-1]
-    start_lat = arr[0]
-    start_lng = arr[1]
-    end_lat = arr[-3]
-    end_lng = arr[-2]
+    start_lat = coords[0].split(' ')[0]
+    start_lng = coords[0].split(' ')[1]
+    end_lat = coords[-1].split(' ')[0]
+    end_lng = coords[-1].split(' ')[1]
     
     geom = "ST_GeometryFromText('MULTILINESTRING((#{coords.join(',')}))', 4326)"
     
     Routelog.connection.execute("INSERT INTO sanpo_routes(id,user_route_id, user_id, start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, public, length, tracking_times, title) VALUES (DEFAULT,#{user_route_id}, '#{user_id}', '#{start_time}', '#{end_time}', '#{start_lat}', '#{start_lng}', '#{end_lat}', '#{end_lng}', #{geom}, '1', ST_Length(ST_Transform(#{geom},26986)), '#{timestamps.join(',')}', '#{title}')")
     
-    return {:result => '1', :start_time => start_time}
+    return {:result => '1', :start_time => arr[2]}
   end
 
   def view_log(user_id, route_id)
@@ -89,6 +92,12 @@ class Routelog < ActiveRecord::Base
     
     # Delete route log from DB
     Routelog.connection.execute("DELETE FROM #{Routelog.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id}")
+
+    # Delete photo files
+    FileUtils.rm_rf "/web_server/user_photos/#{user_id}/#{user_route_id}"
+
+    # Delete photo entries from DB
+    Photolog.connection.execute("DELETE FROM #{Photolog.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id}")
 
     return {:status => '1'}
   end
