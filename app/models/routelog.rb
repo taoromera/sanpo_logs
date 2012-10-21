@@ -39,7 +39,7 @@ class Routelog < ActiveRecord::Base
     
     Routelog.connection.execute("INSERT INTO sanpo_routes(id,user_route_id, user_id, start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, public, length, tracking_times, title) VALUES (DEFAULT,#{user_route_id}, '#{user_id}', '#{start_time}', '#{end_time}', '#{start_lat}', '#{start_lng}', '#{end_lat}', '#{end_lng}', #{geom}, '1', ST_Length(ST_Transform(#{geom},26986)), '#{timestamps.join(',')}', '#{title}')")
     
-    return {:result => '1'}
+    return {:result => '1', :start_time => start_time}
   end
 
   def view_log(user_id, route_id)

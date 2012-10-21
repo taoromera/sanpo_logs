@@ -25,7 +25,7 @@ class Photolog < ActiveRecord::Base
     user_id = Digest::SHA2.hexdigest(params[:user_id])
     
     # Create entry in DB for this photo
-    Photolog.connection.execute("INSERT INTO sanpo_photos VALUES (DEFAULT, '#{user_id}', #{user_route_id}, #{user_photo_id}, #{photo_lat}, #{photo_lon}, '#{[shoot_time.split('_')[0], shoot_time.split('_')[1].gsub!('-', ':')].join(' ')}', '', '#{memo}', '#{geo_tag}')")
+    Photolog.connection.execute("INSERT INTO sanpo_photos VALUES (DEFAULT, '#{user_id}', #{user_route_id}, #{user_photo_id}, #{photo_lat}, #{photo_lon}, '#{[shoot_time.split(' ')[0], shoot_time.split(' ')[1]].join(' ')}', '', '#{memo}', '#{geo_tag}')")
    
     # Get the id of the created entry
     entry_id = Photolog.connection.execute("SELECT id FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}").getvalue(0,0)
@@ -36,11 +36,11 @@ class Photolog < ActiveRecord::Base
     # Save the photo to a file with filename being the id of the photo
     dir = "/web_server/user_photos/#{user_id}/#{user_route_id}/"
     FileUtils.mkdir_p(dir) unless File.exists?(dir)
-    File.open(dir+photo_filename, 'wb') {|f| f.write(params[:photo_data].read)}    
+    File.open(dir+photo_filename, 'wb') {|f| f.write(params[:photo_data].read)}
     
     # Insert filename into DB
     Photolog.connection.execute("UPDATE sanpo_photos SET filename = '#{photo_filename}' WHERE id = #{entry_id}")
    
-    return {:result => '1', :route_id => id, :create_time => shoot_time, :photo_url => "www.sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{photo_filename}"}
+    return {:result => '1', :route_id => entry_id, :create_time => shoot_time, :photo_url => "www.sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{photo_filename}", :user_route_id => user_route_id, :user_photo_id => user_photo_id}
   end
 end
