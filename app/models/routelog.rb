@@ -11,12 +11,8 @@ class Routelog < ActiveRecord::Base
     points = params[:points]
     title = params[:title]
   
-    # If password provided by the querier is incorrect, reject query
-    if password != date[0..3] + user_id.reverse + date[4..5]
-      return "Error: password incorrect"
-    end
-    
-    user_id = Digest::SHA2.hexdigest(params[:user_id])
+    user_id = check_pass(password, user_id)
+    user_id.nil? ? return("Error: password incorrect") : 1
     
     # Split points into coords and timestamps
     arr = points.split(',')
@@ -78,8 +74,30 @@ class Routelog < ActiveRecord::Base
     return {:result => '1', :start_time => start_time, :end_time => end_time, :start_lat => start_lat, :start_lng => start_lng, :end_lat => end_lat, :end_lng => end_lng, :geom => geom, :walk_distance => length, :title => title, :walk_time => walk_time, :photos => photos}
   end
   
+  def del_route
+    user_id = params[:user_id]
+    password = params[:password]
+    date = params[:date]
+    user_route_id = params[:user_route_id]
+  
+    user_id = check_pass(password, user_id)
+    user_id.nil? ? return("Error: password incorrect") : 1
+    
+    # Delete route log from DB
+    Routelog.connection.execute("DELETE FROM #{self.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id}")
+  end
+  
   def factory
     @@factory ||= RGeo::Geographic.spherical_factory(:srid => 4326)
   end
+  
+  def check_pass(password, user_id)
+    # If password provided by the querier is incorrect, reject query
+    if password != date[0..3] + user_id.reverse + date[4..5]
+      return nil
+    else
+      return Digest::SHA2.hexdigest(user_id)
+    end
+  end  
 
 end
