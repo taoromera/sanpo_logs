@@ -1,8 +1,11 @@
 Sanpo::Application.routes.draw do
 
   match 'log/up_photo' => 'Photo#up_photo'
+  match 'log/del_photo' => 'Photo#del_photo'
   match 'log/up_route' => 'Route#up_route'
+  match 'log/del_route' => 'Route#del_route'
   match 'log/view_log' => 'Route#view_log'
+  
 
  resource :session do
     collection do

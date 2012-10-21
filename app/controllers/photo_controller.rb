@@ -7,8 +7,9 @@ class PhotoController < ApplicationController
     render :json => status
   end
   
-  def view_log
+  def del_photo
+    log = Photolog.new
+    status = log.del_photo(params)
+    render :json => status
   end
-
-
 end
