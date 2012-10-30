@@ -19,4 +19,11 @@ class RouteController < ApplicationController
     status = log.del_route(params)
     render :json => status
   end
+  
+  def make_public
+    # params: user_id, password, date, user_route_id
+    log = Routelog.new
+    status = log.make_public(params)
+    render :json => status
+  end
 end

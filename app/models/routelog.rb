@@ -2,6 +2,24 @@ class Routelog < ActiveRecord::Base
 
   self.table_name = "sanpo_routes"
   
+  def make_public(params)
+
+    user_id = params[:user_id]
+    password = params[:password]
+    date = params[:date]
+    user_route_id = params[:user_route_id]
+  
+    user_id = check_pass(password, user_id, date)
+    if user_id.nil?
+      return "Error: password incorrect"
+    end
+
+    Routelog.connection.execute("UPDATE sanpo_routes SET public = '1' WHERE user_id = '#{user_id}' AND user_route_id = #{user_route_id}")
+
+    return {:result => '1'}
+  end
+
+
   def up_route(params)
   
     user_id = params[:user_id]
@@ -38,14 +56,20 @@ class Routelog < ActiveRecord::Base
     
     geom = "ST_GeometryFromText('MULTILINESTRING((#{coords.join(',')}))', 4326)"
     
-    Routelog.connection.execute("INSERT INTO sanpo_routes(id,user_route_id, user_id, start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, public, length, tracking_times, title) VALUES (DEFAULT,#{user_route_id}, '#{user_id}', '#{start_time}', '#{end_time}', '#{start_lat}', '#{start_lng}', '#{end_lat}', '#{end_lng}', #{geom}, '1', ST_Length(ST_Transform(#{geom},26986)), '#{timestamps.join(',')}', '#{title}')")
+    Routelog.connection.execute("INSERT INTO sanpo_routes(id,user_route_id, user_id, start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, public, length, tracking_times, title) VALUES (DEFAULT,#{user_route_id}, '#{user_id}', '#{start_time}', '#{end_time}', '#{start_lat}', '#{start_lng}', '#{end_lat}', '#{end_lng}', #{geom}, '0', ST_Length(ST_Transform(#{geom},26986)), '#{timestamps.join(',')}', '#{title}')")
     
     return {:result => '1', :start_time => arr[2]}
   end
 
   def view_log(user_id, route_id)
     user_id = Digest::SHA2.hexdigest(user_id)
-    res = Routelog.connection.execute("SELECT start_time, end_time, start_lat, start_lng, end_lat, end_lng, ST_AsText(geom), length, title, end_time-start_time FROM sanpo_routes WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}")
+    res = Routelog.connection.execute("SELECT start_time, end_time, start_lat, start_lng, end_lat, end_lng, ST_AsText(geom), length, title, end_time-start_time, public FROM sanpo_routes WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}")
+    
+    # If route is not public, return
+    if (res.getvalue(0,10) == 'f')
+      return {:result => '2'}
+    end
+
     start_time = res.getvalue(0,0)
     end_time = res.getvalue(0,1)
     start_lat = res.getvalue(0,2)
@@ -66,7 +90,8 @@ class Routelog < ActiveRecord::Base
     # Parse route_final to make a RGEO object
     geom = RGeo::GeoJSON.encode(path)
 
-    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}").values.transpose
+    # Get photos for this route
+    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id} ORDER BY id ASC").values.transpose
 
     photos = []
     if !lat.nil?

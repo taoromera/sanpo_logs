@@ -5,6 +5,7 @@ Sanpo::Application.routes.draw do
   match 'log/up_route' => 'Route#up_route'
   match 'log/del_route' => 'Route#del_route'
   match 'log/view_log' => 'Route#view_log'
+  match 'log/make_public' => 'Route#make_public'
   
 
  resource :session do
