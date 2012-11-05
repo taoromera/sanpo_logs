@@ -56,8 +56,16 @@ class Routelog < ActiveRecord::Base
     
     geom = "ST_GeometryFromText('MULTILINESTRING((#{coords.join(',')}))', 4326)"
     
-    Routelog.connection.execute("INSERT INTO sanpo_routes(id,user_route_id, user_id, start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, public, length, tracking_times, title) VALUES (DEFAULT,#{user_route_id}, '#{user_id}', '#{start_time}', '#{end_time}', '#{start_lat}', '#{start_lng}', '#{end_lat}', '#{end_lng}', #{geom}, '0', ST_Length(ST_Transform(#{geom},26986)), '#{timestamps.join(',')}', '#{title}')")
-    
+    # Check if route is already in the DB. If so, overwrite it.
+    id = Routelog.connection.execute("SELECT id FROM sanpo_routes WHERE user_route_id = #{user_route_id} AND user_id = '#{user_id}'").values
+    id.flatten!
+   
+    if id.empty?
+      Routelog.connection.execute("INSERT INTO sanpo_routes(id,user_route_id, user_id, start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, public, length, tracking_times, title) VALUES (DEFAULT,#{user_route_id}, '#{user_id}', '#{start_time}', '#{end_time}', '#{start_lat}', '#{start_lng}', '#{end_lat}', '#{end_lng}', #{geom}, '0', ST_Length(ST_Transform(#{geom},26986)), '#{timestamps.join(',')}', '#{title}')")
+    else
+      Routelog.connection.execute("UPDATE sanpo_routes SET start_time = '#{start_time}', end_time = '#{end_time}', start_lat = #{start_lat}, start_lng = #{start_lng}, end_lat = #{end_lat}, end_lng = #{end_lng}, geom = #{geom}, public = '0', length = ST_Length(ST_Transform(#{geom},26986)), tracking_times = '#{timestamps.join(',')}', title = '#{title}' WHERE id = #{id[0]}")
+    end
+
     return {:result => '1', :start_time => arr[2]}
   end
 
