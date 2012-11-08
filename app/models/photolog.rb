@@ -22,6 +22,13 @@ class Photolog < ActiveRecord::Base
       return("Error: password incorrect")
     end
     
+    # If photo already exists, skip
+    entry_id, photo_filename = Photolog.connection.execute("SELECT id,filename FROM #{Photolog.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id} AND user_photo_id = #{user_photo_id}").values.flatten
+ 
+    if !entry_id.nil?
+      return {:result => '1', :route_id => entry_id, :create_time => shoot_time, :photo_url => "sanpo.mobi/user_photos/#{user_id}/#{user_route_id}/#{photo_filename}", :user_route_id => user_route_id, :user_photo_id => user_photo_id}
+    end
+    
     # Create entry in DB for this photo
     Photolog.connection.execute("INSERT INTO #{Photolog.table_name} VALUES (DEFAULT, '#{user_id}', #{user_route_id}, #{user_photo_id}, #{photo_lat}, #{photo_lon}, '#{[shoot_time.split(' ')[0], shoot_time.split(' ')[1]].join(' ')}', '', '#{memo}', '#{geo_tag}')")
    
