@@ -23,7 +23,7 @@ gem "paperclip", "~> 3.0"
 
 #To get messages from exceptions in our server
 gem 'exception_notification'
-gem 'letter_opener', group: :development
+gem 'letter_opener'
 
 # Gems used only for assets and not required
 # in production environments by default.

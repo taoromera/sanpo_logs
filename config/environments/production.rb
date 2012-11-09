@@ -66,10 +66,10 @@ Sanpo::Application.configure do
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
 
   config.middleware.use ExceptionNotifier,
-    email_prefix: '[SANPO EXCEPTION]',
-    sender_address: 'sanpomobi@gmail.com',
-    exception_recipients: 'mumismo@gmail.com, taoromera@gmail.com',
-    ignore_exceptions: ExceptionNotifier.default_ignore_exceptions # + [RuntimeError]
+    :email_prefix => '[SANPO EXCEPTION]',
+    :sender_address => 'sanpojp@gmail.com',
+    :exception_recipients => 'taoromera@gmail.com'
+    #:ignore_exceptions => ExceptionNotifier.default_ignore_exceptions # + [RuntimeError]
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
@@ -78,10 +78,8 @@ Sanpo::Application.configure do
     domain: "gmail.com",
     authentication: "plain",
     enable_starttls_auto: true,
-    user_name: $MAIL_USER,
-    password: $MAIL_PASSWORD
+    user_name: "sanpojp",
+    password: "sanpojp34"
   }
-
-
 
 end
