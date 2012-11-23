@@ -63,7 +63,11 @@ class Routelog < ActiveRecord::Base
     if id.empty?
       Routelog.connection.execute("INSERT INTO sanpo_routes(id,user_route_id, user_id, start_time, end_time, start_lat, start_lng, end_lat, end_lng, geom, public, length, tracking_times, title) VALUES (DEFAULT,#{user_route_id}, '#{user_id}', '#{start_time}', '#{end_time}', '#{start_lat}', '#{start_lng}', '#{end_lat}', '#{end_lng}', #{geom}, '0', ST_Length(ST_Transform(#{geom},26986)), '#{timestamps.join(',')}', '#{title}')")
     else
+      # Overwrite existing route data
       Routelog.connection.execute("UPDATE sanpo_routes SET start_time = '#{start_time}', end_time = '#{end_time}', start_lat = #{start_lat}, start_lng = #{start_lng}, end_lat = #{end_lat}, end_lng = #{end_lng}, geom = #{geom}, length = ST_Length(ST_Transform(#{geom},26986)), tracking_times = '#{timestamps.join(',')}', title = '#{title}' WHERE id = #{id[0]}")
+      
+      # Delete photos associated with the old route
+      FileUtils.rm_rf("/web_server/user_photos/#{user_id}/#{user_route_id}/")
     end
 
     return {:result => '1', :start_time => arr[2]}
@@ -73,6 +77,11 @@ class Routelog < ActiveRecord::Base
     user_id = Digest::SHA2.hexdigest(user_id)
     res = Routelog.connection.execute("SELECT start_time, end_time, start_lat, start_lng, end_lat, end_lng, ST_AsText(geom), length, title, end_time-start_time, public FROM sanpo_routes WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}")
     
+    # If route does not exist, return
+    if res.values.empty?
+      return {:result => '2'}
+    end
+
     # If route is not public, return
     if (res.getvalue(0,10) == 'f')
       return {:result => '2'}
