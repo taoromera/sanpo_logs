@@ -68,6 +68,7 @@ class Routelog < ActiveRecord::Base
       
       # Delete photos associated with the old route
       FileUtils.rm_rf("/web_server/user_photos/#{user_id}/#{user_route_id}/")
+      Photolog.connection.execute("DELETE FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id}")
     end
 
     return {:result => '1', :start_time => arr[2]}
