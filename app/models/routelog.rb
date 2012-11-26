@@ -109,7 +109,7 @@ class Routelog < ActiveRecord::Base
     geom = RGeo::GeoJSON.encode(path)
 
     # Get photos for this route
-    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id} ORDER BY id ASC").values.transpose
+    lat, lon, shoot_time, memo, geo_tag, filename = Routelog.connection.execute("SELECT lat, lng, shoot_time, memo, geo_tag, filename FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_id = #{route_id} ORDER BY shoot_time ASC").values.transpose
 
     photos = []
     if !lat.nil?
