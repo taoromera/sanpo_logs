@@ -1,5 +1,12 @@
 class RouteController < ApplicationController
  
+  def add_like
+    # params: user_id, user_route_id
+    log = Routelog.new
+    status = log.add_like(params)
+    render :json => status
+  end
+
   def up_route
     # params: user_id, password, date, user_route_id, points, title
     log = Routelog.new

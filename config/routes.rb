@@ -6,6 +6,7 @@ Sanpo::Application.routes.draw do
   match 'log/del_route' => 'Route#del_route'
   match 'log/view_log' => 'Route#view_log'
   match 'log/make_public' => 'Route#make_public'
+  match 'log/add_like' => 'Route#add_like'
   
 
  resource :session do
