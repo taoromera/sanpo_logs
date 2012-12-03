@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 class Routelog < ActiveRecord::Base
 
   self.table_name = "sanpo_routes"
@@ -36,12 +38,33 @@ class Routelog < ActiveRecord::Base
     
     # Split points into coords and timestamps
     arr = points.split(',')
+    #Keep timestamp that will be sent back to the iPhone
+    start_iPhone = String.new(arr[2])
     coords = []
     timestamps = []
     (0..arr.length/3-1).each do |idx|
       # Filter out incorrect GPS measurement points (-180, -180) 
       if arr[idx*3+1].to_i != -180 && arr[idx*3].to_i != -180
         coords.push "#{arr[idx*3+1]} #{arr[idx*3]}"
+        
+        # Change timestamp format to make it compatible with PostgreSQL
+        if arr[idx*3+2].include?('午前')
+          arr[idx*3+2].delete!('午前')
+        elsif arr[idx*3+2].include?('午後')
+          arr[idx*3+2].delete!('午後')
+          t_date, t_time = arr[idx*3+2].split(' ')
+          t_hour, t_min, t_sec = t_time.split(':')
+          t_hour = t_hour.to_i + 12
+          arr[idx*3+2] = t_date + ' ' + t_hour.to_s + ':' + t_min + ':' + t_sec
+        end
+        
+        # Replace Japanese calendar years with western calendar years
+        arr[idx*3+2].gsub!('0024', '2012')
+        arr[idx*3+2].gsub!('0025', '2013')
+        arr[idx*3+2].gsub!('0026', '2014')
+        arr[idx*3+2].gsub!('0027', '2015')
+        arr[idx*3+2].gsub!('0028', '2016')
+        
         timestamps.push arr[idx*3+2]
       end
     end
@@ -71,7 +94,7 @@ class Routelog < ActiveRecord::Base
       Photolog.connection.execute("DELETE FROM sanpo_photos WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id}")
     end
 
-    return {:result => '1', :start_time => arr[2]}
+    return {:result => '1', :start_time => start_iPhone}
   end
 
   def view_log(user_id, route_id)
