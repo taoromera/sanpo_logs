@@ -4,8 +4,24 @@ class Routelog < ActiveRecord::Base
 
   self.table_name = "sanpo_routes"
   
-  def make_public(params)
+  def add_like(params)
+    user_id = params[:user_id]
+    user_route_id = params[:route_id]
 
+    # Check if entry exists for this route
+    id = Routelog.connection.execute("SELECT id FROM sanpo_likes WHERE user_route_id = #{user_route_id} AND user_id = '#{user_id}'").values
+    id.flatten!
+   
+    if id.empty?
+      Routelog.connection.execute("INSERT INTO sanpo_likes VALUES (DEFAULT, #{user_route_id}, '#{user_id}', 1)")
+    else
+      Routelog.connection.execute("UPDATE sanpo_likes SET likes = likes + 1 WHERE user_id = '#{user_id}' AND user_route_id = #{user_route_id}")
+    end
+
+    return []
+  end
+
+  def make_public(params)
     user_id = params[:user_id]
     password = params[:password]
     date = params[:date]
@@ -155,6 +171,9 @@ class Routelog < ActiveRecord::Base
     if user_id.nil?
       return("Error: password incorrect")
     end
+
+    # Delete likes for this route
+    Routelog.connection.execute("DELETE FROM sanpo_likes WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id}")
     
     # Delete route log from DB
     Routelog.connection.execute("DELETE FROM #{Routelog.table_name} WHERE user_id = '#{user_id}' AND user_route_ID = #{user_route_id}")
