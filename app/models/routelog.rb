@@ -115,6 +115,10 @@ class Routelog < ActiveRecord::Base
 
   def view_log(user_id, route_id)
     user_id = Digest::SHA2.hexdigest(user_id)
+
+    # Make route public
+    Routelog.connection.execute("UPDATE sanpo_routes SET public = '1' WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}")
+
     res = Routelog.connection.execute("SELECT start_time, end_time, start_lat, start_lng, end_lat, end_lng, ST_AsText(geom), length, title, end_time-start_time, public FROM sanpo_routes WHERE user_id = '#{user_id}' AND user_route_id = #{route_id}")
     
     # If route does not exist, return
