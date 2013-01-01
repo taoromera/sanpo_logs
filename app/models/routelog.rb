@@ -71,6 +71,7 @@ class Routelog < ActiveRecord::Base
           t_date, t_time = arr[idx*3+2].split(' ')
           t_hour, t_min, t_sec = t_time.split(':')
           t_hour = t_hour.to_i + 12
+	  t_hour == 24 ? t_hour = '00' : 1
           arr[idx*3+2] = t_date + ' ' + t_hour.to_s + ':' + t_min + ':' + t_sec
         end
         
