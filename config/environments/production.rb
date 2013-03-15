@@ -79,7 +79,7 @@ Sanpo::Application.configure do
     authentication: "plain",
     enable_starttls_auto: true,
     user_name: "sanpojp",
-    password: "sanpojp34"
+    password: "sanpojp345"
   }
 
 end

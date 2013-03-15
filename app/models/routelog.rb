@@ -86,6 +86,12 @@ class Routelog < ActiveRecord::Base
       end
     end
 
+    # If after cleaning coord points we do not have any points left, fill in with arbitrary data (Tokyo station)
+    if coords.empty?
+      coords.push '139.767367 35.681283';
+      coords.push '139.767367 35.681283';
+    end
+
     # Insert data into DB
     start_time = timestamps[0]
     end_time = timestamps[-1]
